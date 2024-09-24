@@ -13,6 +13,12 @@ import "lib/chainlink-brownie-contracts/contracts/src/v0.8/vrf/dev/interfaces/IV
 contract Raffle is VRFConsumerBaseV2Plus {
     error Rafflec__NotEnoughEth();
     error Rafflec__TrancvelFailed();
+    error Rafflec__NotOpen();
+
+    enum RafflesState {
+        OPEN,
+        CALCULATIN
+    }
 
     uint16 private constant REQUEST_CONFIRMATIONS = 3;
     uint32 private constant NUM_WORDS = 1;
@@ -24,10 +30,12 @@ contract Raffle is VRFConsumerBaseV2Plus {
     address payable[] private s_players;
     uint256 private s_lastTimeStap;
     address private s_recentWinner;
+    RafflesState private s_raffelState;
 
     //Events
 
     event RaffleEntered(address indexed player);
+    event WinnerPicked(address indexed winner);
 
     constructor(
         uint256 entranceFee,
@@ -39,10 +47,12 @@ contract Raffle is VRFConsumerBaseV2Plus {
     ) VRFConsumerBaseV2Plus(vrfCoordinator) {
         i_entranceFee = entranceFee;
         i_interval = interval;
-        s_lastTimeStap = block.timestamp;
         i_keyHash = gasLane;
         i_subscriptionId = subscriptionId;
         i_callbackGasLimit = callbackGasLimit;
+
+        s_lastTimeStap = block.timestamp;
+        s_raffelState = RafflesState.OPEN;
     }
 
     function enterRaffle() external payable {
@@ -51,7 +61,9 @@ contract Raffle is VRFConsumerBaseV2Plus {
         if (msg.value < i_entranceFee) {
             revert Rafflec__NotEnoughEth();
         }
-
+        if (s_raffelState != RafflesState.OPEN) {
+            revert Rafflec__NotOpen();
+        }
         s_players.push(payable(msg.sender));
         emit RaffleEntered(msg.sender);
     }
@@ -60,6 +72,7 @@ contract Raffle is VRFConsumerBaseV2Plus {
         if ((block.timestamp - s_lastTimeStap) > i_interval) {
             revert();
         }
+        s_raffelState = RafflesState.CALCULATIN;
 
         VRFV2PlusClient.RandomWordsRequest memory request = VRFV2PlusClient
             .RandomWordsRequest({
@@ -83,11 +96,16 @@ contract Raffle is VRFConsumerBaseV2Plus {
     ) internal override {
         uint256 indexOfWinner = randomWords[0] % s_players.length;
         address payable recentWinner = s_players[indexOfWinner];
+
         s_recentWinner = recentWinner;
+        s_players = new address payable[](0);
+        s_lastTimeStap = block.timestamp;
+
         (bool success, ) = recentWinner.call{value: address(this).balance}("");
         if (!success) {
             revert Rafflec__TrancvelFailed();
         }
+        emit WinnerPicked(s_recentWinner);
     }
 
     function getEnterRaffle() external view returns (uint256) {
