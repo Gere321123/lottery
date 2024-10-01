@@ -12,5 +12,4 @@ docs/
 
 # Dotenv file
 .env
-solidyti-lottery/
-src/lottery/
+
