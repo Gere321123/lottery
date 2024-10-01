@@ -14,6 +14,11 @@ contract Raffle is VRFConsumerBaseV2Plus {
     error Rafflec__NotEnoughEth();
     error Rafflec__TrancvelFailed();
     error Rafflec__NotOpen();
+    error Raffle__UpkeepNotNeeded(
+        uint256 balance,
+        uint256 playersLength,
+        uint256 raffleState
+    );
 
     enum RafflesState {
         OPEN,
@@ -68,9 +73,32 @@ contract Raffle is VRFConsumerBaseV2Plus {
         emit RaffleEntered(msg.sender);
     }
 
+    /**
+     *@dev If the lotery is ready to have a winner picked.
+     */
+    function checkUpkeep(
+        bytes memory /*checkData*/
+    )
+        external
+        view
+        returns (bool upkeepNeeded, bytes memory /* performData */)
+    {
+        bool timeHasPassed = ((block.timestamp - s_lastTimeStap) >= i_interval);
+        bool isOpen = s_raffelState == RafflesState.OPEN;
+        bool hasBalance = address(this).balance > 0;
+        bool hasPlayers = s_players.length > 0;
+        upkeepNeeded = timeHasPassed && isOpen && hasBalance && hasPlayers;
+        return (upkeepNeeded, "");
+    }
+
     function pickWinner() external {
-        if ((block.timestamp - s_lastTimeStap) > i_interval) {
-            revert();
+        (bool upkeepNeeded, ) = this.checkUpkeep("");
+        if (!upkeepNeeded) {
+            revert Raffle__UpkeepNotNeeded(
+                address(this).balance,
+                s_players.length,
+                uint256(s_raffelState)
+            );
         }
         s_raffelState = RafflesState.CALCULATIN;
 
