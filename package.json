@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "@nomicfoundation/hardhat-chai-matchers": "^2.0.8"
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.8",
+    "solmate": "^6.2.0"
   },
   "devDependencies": {
     "hardhat": "^2.22.12"

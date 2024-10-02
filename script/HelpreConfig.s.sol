@@ -21,6 +21,7 @@ contract HelpConfig is CodeConstants, Script {
         bytes32 gasLane;
         uint256 subscriptionId;
         uint32 callbackGasLimit;
+        address link;
     }
     NetworkConfig public localNetwoekConfig;
     mapping(uint256 chainId => NetworkConfig) public networkConfigs;
@@ -53,7 +54,8 @@ contract HelpConfig is CodeConstants, Script {
                 vrfCoordinator: 0x9DdfaCa8183c41ad55329BdeeD9F6A8d53168B1B,
                 gasLane: 0x3fd2fec10d06ee8f65e7f2e95f5c56511359ece3f33960ad8a866ae24a8ff10b,
                 callbackGasLimit: 500000,
-                subscriptionId: 0
+                subscriptionId: 0,
+                link: 0x514910771AF9Ca656af840dff83E8264EcF986CA
             });
     }
 
