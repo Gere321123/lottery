@@ -1,0 +1,30 @@
+{
+  "dependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.8"
+  },
+  "devDependencies": {
+    "hardhat": "^2.22.12"
+  },
+  "name": "lottery",
+  "description": "**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gere321123/lottery.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Gere321123/lottery/issues"
+  },
+  "homepage": "https://github.com/Gere321123/lottery#readme"
+}
