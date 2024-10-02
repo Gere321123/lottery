@@ -81,7 +81,14 @@ contract AddConsummer is Script {
         address contractToVrf,
         address vrfCoordinator,
         uint256 subId
-    ) public {}
+    ) public {
+        vm.startBroadcast();
+        VRFCoordinatorV2_5Mock(vrfCoordinator).addConsumer(
+            subId,
+            contractToVrf
+        );
+        vm.stopBroadcast();
+    }
 
     function run() external {
         address mostRecentlyDeployed = DevOpsTools.get_most_recent_deployment(
